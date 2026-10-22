@@ -13,24 +13,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup PHP SDK
-        uses: php/setup-php-sdk@v0.8.8
-        with:
-          mode: php-src
-          version: '7.4'
-          arch: x64
-          ts: 0
+      - name: Install BuildPhp PowerShell Module
+        shell: pwsh
+        run: Install-Module -Name BuildPhp -Repository PSGallery -Force
 
-      - name: Build PHP CLI
-        shell: cmd
-        run: |
-          buildconf.bat
-          configure.bat --disable-all --enable-cli
-          nmake
+      - name: Build PHP from source
+        shell: pwsh
+        run: Invoke-PhpBuild -Arch x64 -Ts nts
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: php-windows-x64
           path: |
+            artifacts/
             **/php.exe
